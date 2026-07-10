@@ -1,0 +1,10 @@
+flask
+sentence-transformers
+spacy
+pdfplumber
+PyMuPDF
+scikit-learn
+pandas
+numpy
+sqlite3
+openpyxl
