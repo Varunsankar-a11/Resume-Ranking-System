@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Ranking Result</title>
+
+    <style>
+
+        body{
+
+            font-family:Arial;
+
+            background:#f4f4f4;
+
+            margin:40px;
+
+        }
+
+        .container{
+
+            width:700px;
+
+            margin:auto;
+
+            background:white;
+
+            padding:30px;
+
+            border-radius:10px;
+
+            box-shadow:0px 0px 10px gray;
+
+        }
+
+        table{
+
+            width:100%;
+
+            border-collapse:collapse;
+
+            margin-top:20px;
+
+        }
+
+        th,td{
+
+            border:1px solid #ddd;
+
+            padding:12px;
+
+            text-align:center;
+
+        }
+
+        th{
+
+            background:#3498db;
+
+            color:white;
+
+        }
+
+        h1{
+
+            text-align:center;
+
+        }
+
+        a{
+
+            text-decoration:none;
+
+            color:white;
+
+            background:#2ecc71;
+
+            padding:10px 20px;
+
+            border-radius:5px;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Resume Ranking Results</h1>
+
+<table>
+
+<tr>
+
+<th>Rank</th>
+
+<th>Resume</th>
+
+<th>Match Score</th>
+
+</tr>
+
+{% for result in results %}
+
+<tr>
+
+<td>{{ loop.index }}</td>
+
+<td>{{ result.name }}</td>
+
+<td>{{ result.score }}%</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+<br>
+
+<center>
+
+<a href="/">Upload More</a>
+
+</center>
+
+</div>
+
+</body>
+
+</html>
