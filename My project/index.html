@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraResume AI - Resume Ranking & Voice Assistant</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PDF.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <div class="logo-text">
+                    <h1>AuraResume <span>AI</span></h1>
+                    <p>Next-Gen Intelligent Resume Ranking & ATS Optimizer</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span class="status-badge"><span class="pulse-dot"></span> System Ready</span>
+                <button id="settingsBtn" class="icon-btn" title="System Settings"><i class="fa-solid fa-cog"></i></button>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Layout -->
+        <main class="dashboard-grid">
+            <!-- Left Side: Config & Upload -->
+            <section class="control-panel">
+                <!-- Job Description Panel -->
+                <div class="glass-card job-panel">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-briefcase"></i> Job Requirement Profile</h2>
+                        <div class="select-wrapper">
+                            <select id="jobTemplateSelect">
+                                <option value="custom">-- Custom Template --</option>
+                                <option value="frontend">Senior Frontend Engineer</option>
+                                <option value="backend">Python / Backend Developer</option>
+                                <option value="datascientist">Data Scientist & AI Specialist</option>
+                                <option value="uxdesigner">UI/UX Product Designer</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <label for="jobTitle">Target Job Title</label>
+                            <input type="text" id="jobTitle" placeholder="e.g. Senior Frontend Developer" value="Senior Frontend Engineer">
+                        </div>
+                        <div class="input-group">
+                            <label for="jobDescription">Key Skills & Requirements (Comma separated or descriptive text)</label>
+                            <textarea id="jobDescription" placeholder="Enter keywords, skills, and qualifications required... (e.g. React, TypeScript, Redux, Node.js, Webpack, 5+ years experience, CSS3, UX design, communication skills)"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Upload Panel -->
+                <div class="glass-card upload-panel">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-cloud-arrow-up"></i> Upload Candidates</h2>
+                        <span class="badge">PDF, TXT supported</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="dropzone" class="dropzone">
+                            <input type="file" id="fileInput" multiple accept=".pdf,.txt" class="file-hidden">
+                            <div class="dropzone-content">
+                                <i class="fa-solid fa-file-invoice-paragraph upload-icon"></i>
+                                <p class="primary-text">Drag & drop resume files here</p>
+                                <p class="secondary-text">or <span class="browse-link">browse files</span> on your computer</p>
+                            </div>
+                        </div>
+                        <div id="uploadQueue" class="upload-queue"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Side: Assistant & Stats -->
+            <section class="assistant-panel">
+                <!-- Voice Assistant Widget -->
+                <div class="glass-card assistant-widget">
+                    <div class="card-header">
+                        <h2><i class="fa-solid fa-microphone-lines"></i> Aura Voice Assistant</h2>
+                        <div class="assistant-status">
+                            <span id="assistantStatusText">Idle</span>
+                        </div>
+                    </div>
+                    <div class="card-body voice-body">
+                        <!-- Waveform animations -->
+                        <div class="assistant-avatar-container">
+                            <div class="glowing-orb" id="assistantOrb">
+                                <div class="avatar-ring ring-1"></div>
+                                <div class="avatar-ring ring-2"></div>
+                                <div class="avatar-ring ring-3"></div>
+                                <div class="avatar-inner">
+                                    <i class="fa-solid fa-microphone" id="assistantIcon"></i>
+                                </div>
+                            </div>
+                            <!-- Live Voice Wave -->
+                            <div class="voice-wave" id="voiceWave">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+
+                        <!-- Audio Control Actions -->
+                        <div class="voice-controls">
+                            <button id="listenBtn" class="action-btn mic-btn">
+                                <i class="fa-solid fa-microphone"></i> Start Listening
+                            </button>
+                            <button id="stopVoiceBtn" class="action-btn stop-btn btn-secondary" disabled>
+                                <i class="fa-solid fa-volume-xmark"></i> Stop Speech
+                            </button>
+                        </div>
+
+                        <!-- Conversation Logs -->
+                        <div class="chat-log-container">
+                            <div id="chatLog" class="chat-log">
+                                <div class="chat-message assistant">
+                                    <div class="msg-bubble">
+                                        Hi! I am Aura, your resume voice assistant. Upload resumes and paste job details, then click "Start Listening" to speak with me. Try asking: <em>"Who is the best candidate?"</em> or <em>"Explain the matching scores"</em>.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Action Prompts -->
+                        <div class="suggested-prompts">
+                            <span class="prompt-tag" data-cmd="Who is the top candidate?">Who is the top candidate?</span>
+                            <span class="prompt-tag" data-cmd="Explain the top rank applicant">Explain top rank</span>
+                            <span class="prompt-tag" data-cmd="Compare the top two candidates">Compare top two</span>
+                            <span class="prompt-tag" data-cmd="Reset all analysis">Reset all</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Stats Counter Panel -->
+        <section class="stats-row">
+            <div class="glass-card stat-card">
+                <div class="stat-icon purple-glow"><i class="fa-solid fa-users"></i></div>
+                <div class="stat-details">
+                    <span class="stat-val" id="statTotalResumes">0</span>
+                    <span class="stat-label">Resumes Processed</span>
+                </div>
+            </div>
+            <div class="glass-card stat-card">
+                <div class="stat-icon green-glow"><i class="fa-solid fa-award"></i></div>
+                <div class="stat-details">
+                    <span class="stat-val" id="statTopScore">0%</span>
+                    <span class="stat-label">Highest Match</span>
+                </div>
+            </div>
+            <div class="glass-card stat-card">
+                <div class="stat-icon blue-glow"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="stat-details">
+                    <span class="stat-val" id="statAvgScore">0%</span>
+                    <span class="stat-label">Average Match Score</span>
+                </div>
+            </div>
+            <div class="glass-card stat-card">
+                <div class="stat-icon orange-glow"><i class="fa-solid fa-circle-exclamation"></i></div>
+                <div class="stat-details">
+                    <span class="stat-val" id="statTopCandidate">None</span>
+                    <span class="stat-label">Current Leader</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Table Panel: Resume Ranks -->
+        <section class="ranking-panel glass-card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-ranking-star"></i> AI Candidate Ranking Table</h2>
+                <div class="table-actions">
+                    <button id="clearAllBtn" class="btn-danger"><i class="fa-solid fa-trash-can"></i> Clear All</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="rankingsTable">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Candidate Details</th>
+                            <th>Overall Match Score</th>
+                            <th>Experience Info</th>
+                            <th>Matching Skills</th>
+                            <th>Missing Critical Skills</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rankingsTableBody">
+                        <tr id="emptyRow">
+                            <td colspan="7" class="empty-message-cell">
+                                <i class="fa-solid fa-folder-open empty-icon"></i>
+                                <p>No resumes analyzed yet. Complete the Job Profile and upload resumes above to start ranking.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Resume Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content glass-card">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <div class="modal-header">
+                <h2 id="modalCandidateName">Candidate Name</h2>
+                <p id="modalCandidateContact"><i class="fa-solid fa-envelope"></i> email@example.com | <i class="fa-solid fa-phone"></i> +123456789</p>
+            </div>
+            <div class="modal-body-layout">
+                <!-- Modal Left: Stats & Score break downs -->
+                <div class="modal-score-col">
+                    <div class="overall-progress-container">
+                        <div class="progress-ring-box">
+                            <svg class="progress-ring" width="120" height="120">
+                                <circle class="progress-ring-bg" stroke="#1d1b38" stroke-width="8" fill="transparent" r="50" cx="60" cy="60" />
+                                <circle id="modalProgressCircle" class="progress-ring-bar" stroke="var(--primary-glow)" stroke-width="8" stroke-dasharray="314.16" stroke-dashoffset="314.16" fill="transparent" r="50" cx="60" cy="60" />
+                            </svg>
+                            <span id="modalScoreText" class="progress-text">0%</span>
+                        </div>
+                        <h3>Overall ATS Match</h3>
+                    </div>
+
+                    <div class="score-breakdown">
+                        <h4>Analysis Breakdown</h4>
+                        <div class="breakdown-item">
+                            <span class="lbl">Skill Keyword Match</span>
+                            <div class="progress-bar-flat"><span id="barSkillMatch" style="width: 0%"></span></div>
+                            <span class="pct" id="valSkillMatch">0%</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="lbl">Experience & History</span>
+                            <div class="progress-bar-flat"><span id="barExpMatch" style="width: 0%"></span></div>
+                            <span class="pct" id="valExpMatch">0%</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="lbl">Formatting & Structuring</span>
+                            <div class="progress-bar-flat"><span id="barFormatMatch" style="width: 0%"></span></div>
+                            <span class="pct" id="valFormatMatch">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Right: Text details -->
+                <div class="modal-details-col">
+                    <!-- Tabs -->
+                    <div class="modal-tabs">
+                        <button class="tab-btn active" data-tab="tabInsights">AI Assessment</button>
+                        <button class="tab-btn" data-tab="tabText">Parsed Content</button>
+                    </div>
+
+                    <div class="tab-content active" id="tabInsights">
+                        <div class="insights-box">
+                            <div class="insight-section strengths">
+                                <h5><i class="fa-solid fa-circle-check"></i> Primary Strengths</h5>
+                                <ul id="modalStrengthsList">
+                                    <li>Parsed successfully.</li>
+                                </ul>
+                            </div>
+                            <div class="insight-section gaps">
+                                <h5><i class="fa-solid fa-triangle-exclamation"></i> Skills Gaps</h5>
+                                <ul id="modalGapsList">
+                                    <li>None identified.</li>
+                                </ul>
+                            </div>
+                            <div class="insight-section feedback">
+                                <h5><i class="fa-solid fa-lightbulb"></i> Tailored Recommendations</h5>
+                                <p id="modalFeedbackText">Analyzing resume data...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tabText">
+                        <div class="raw-text-viewer">
+                            <pre id="modalRawText">No content loaded.</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="modalVoiceSummaryBtn" class="action-btn"><i class="fa-solid fa-volume-high"></i> Listen to AI Assessment</button>
+                <button id="modalCloseBtn" class="btn-secondary">Close Details</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content glass-card settings-modal-content">
+            <span class="close-btn" id="closeSettingsModal">&times;</span>
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-sliders"></i> System Configurations</h2>
+                <p>Customize analysis engines, API keys, and voice characteristics.</p>
+            </div>
+            <div class="modal-body">
+                <div class="settings-group">
+                    <h3>AI Scoring Engine Mode</h3>
+                    <div class="radio-toggle-group">
+                        <label class="radio-label">
+                            <input type="radio" name="aiEngineMode" value="local" checked>
+                            <span class="custom-radio-text">
+                                <strong>Local Heuristics Engine</strong>
+                                <span>High-speed rule-based keyword & experience extraction (Privacy-safe, local)</span>
+                            </span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="aiEngineMode" value="gemini">
+                            <span class="custom-radio-text">
+                                <strong>Google Gemini API (LLM)</strong>
+                                <span>Real context-aware assessment, deep recommendations & chat parsing</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group api-key-field" id="apiKeySettingsGroup">
+                    <label for="geminiApiKey">Gemini API Key</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="geminiApiKey" placeholder="AIzaSy...">
+                        <button type="button" id="toggleApiKeyVisibility" class="visibility-btn"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                    <p class="input-tip">Your API key is stored locally in your browser's LocalStorage and is sent directly to Google Gemini API servers. Leave blank to default back to the local NLP model.</p>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Voice Assistant Voice Selection</h3>
+                    <div class="input-group">
+                        <label for="voiceSelect">Aura Voice Avatar</label>
+                        <div class="select-wrapper">
+                            <select id="voiceSelect">
+                                <option value="default">System Default Voice</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="range-group">
+                        <div class="range-item">
+                            <label for="voiceRate">Speech Speed: <span id="rateVal">1.0</span></label>
+                            <input type="range" id="voiceRate" min="0.5" max="2.0" step="0.1" value="1.0">
+                        </div>
+                        <div class="range-item">
+                            <label for="voicePitch">Speech Pitch: <span id="pitchVal">1.0</span></label>
+                            <input type="range" id="voicePitch" min="0.5" max="2.0" step="0.1" value="1.0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveSettingsBtn" class="action-btn">Save Configurations</button>
+                <button id="cancelSettingsBtn" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
