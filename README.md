@@ -1,3 +1,4 @@
+(https://github.com/user-attachments/files/30016864/AuraResume_AI_Detailed_Report_23_Pages.pdf)
 # AI-Based Resume Ranking System
 
 An AI-powered system that analyzes resumes, extracts candidate skills, compares them with job requirements, and ranks candidates based on semantic similarity using NLP and Machine Learning.
